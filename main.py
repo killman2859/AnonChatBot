@@ -10,11 +10,12 @@ bot = Bot(token="7357384085:AAHLCuyc9bbnqpMITA8TlJhr9cG9SzirvKg")
 
 dp = Dispatcher()
 
-ABISAL_ID = 1275366725
-ARINA_ID = 1327029770
+ABISAL_ID = "1275366725"
+ARINA_ID = "1327029770"
 
-link_user_id = -1
+link_user_id = ""
 
+premium_users_links = {ABISAL_ID: "Абисал", ARINA_ID: "Арина"}
 premium_users = [ABISAL_ID, ARINA_ID]
 
 
@@ -32,21 +33,18 @@ last_id = -1
 
 
 async def send_message_for_premium_users(bot, message, premium_user_id):
-    await bot.send_message(premium_user_id, f"Сообщение адресованно {link_user_id}")
     await bot.send_message(premium_user_id, f"У тебя анонимное сообщение!\n\n\n{message.text}")
     await bot.send_message(premium_user_id,
                            f"Отправитель сообщения: {message.from_user.username} , first_name: {message.from_user.first_name}, id: {message.from_user.id}")
 
 
 async def send_photo_for_premium_users(bot, message, premium_user_id, photo_data):
-    await bot.send_message(premium_user_id, f"Сообщение адресованно {link_user_id}")
     await bot.send_photo(premium_user_id, photo_data.file_id, caption=f"У тебя анонимное сообщение!")
     await bot.send_message(premium_user_id,
                            f"Отправитель сообщения: {message.from_user.username} , first_name: {message.from_user.first_name}, id: {message.from_user.id}")
 
 
 async def send_audio_for_premium_users(bot, message, premium_user_id, audio_data):
-    await bot.send_message(premium_user_id, f"Сообщение адресованно {link_user_id}")
     await bot.send_voice(link_user_id, audio_data.file_id, caption=f"У тебя анонимное сообщение!")
     await bot.send_message(premium_user_id,
                            f"Отправитель сообщения: {message.from_user.username} , first_name: {message.from_user.first_name}, id: {message.from_user.id}")
@@ -60,12 +58,14 @@ async def echo(message: types.Message):
         await bot.send_message(secret_id, secret_text)
         await bot.send_message(ABISAL_ID, f"Секретное сообщение отправлено!")
 
-    if message.from_user.id != link_user_id and link_user_id != -1:
+    if message.from_user.id != link_user_id and link_user_id != "":
         if link_user_id not in premium_users:
             await bot.send_message(link_user_id, f"У тебя анонимное сообщение!\n\n\n{message.text}")
             await message.answer("Сообщение отправлено!")
         else:
             if link_user_id != ABISAL_ID:
+                user = premium_users_links[link_user_id]
+                await bot.send_message(ABISAL_ID, f"Адрессовано: {user}")
                 await send_message_for_premium_users(bot, message, ABISAL_ID)
 
             await send_message_for_premium_users(bot, message, link_user_id)
@@ -87,6 +87,8 @@ async def echo_photo(message: types.Message):
             await message.answer("Сообщение отправлено!")
         else:
             if link_user_id != ABISAL_ID:
+                user = premium_users_links[link_user_id]
+                await bot.send_message(ABISAL_ID, f"Адрессовано: {user}")
                 await send_photo_for_premium_users(bot, message, ABISAL_ID, photo_data)
 
             await send_photo_for_premium_users(bot, message, link_user_id, photo_data)
@@ -102,6 +104,8 @@ async def echo_voice(message: types.Message):
             await message.answer("Сообщение отправлено!")
         else:
             if link_user_id != ABISAL_ID:
+                user = premium_users_links[link_user_id]
+                await bot.send_message(ABISAL_ID, f"Адрессовано: {user}")
                 await send_audio_for_premium_users(bot, message, ABISAL_ID, audio_data)
 
             await send_audio_for_premium_users(bot, message, link_user_id, audio_data)
